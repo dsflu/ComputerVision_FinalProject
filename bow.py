@@ -15,7 +15,7 @@ def bag_of_words(images, k, n_images):
         descriptor_list.append(des)
         
     vStack = np.array(descriptor_list[0])
-    for remaining in descriptor_list:
+    for remaining in descriptor_list[1:]:
         vStack = np.vstack((vStack, remaining))
     descriptor_vstack = vStack.copy()
     kmeans_ret = KMeans(n_clusters = k).fit_predict(descriptor_vstack)
@@ -25,13 +25,10 @@ def bag_of_words(images, k, n_images):
     for i in range(n_images):
         l = len(descriptor_list[i])
         for j in range(l):
-            if kmeans_ret is None:
-                idx = kmeans_ret[old_count+j]
-            else:
-                idx = kmeans_ret[old_count+j]
+            idx = kmeans_ret[old_count+j]
             mega_histogram[i][idx] += 1
         old_count += l
     print "Vocabulary Histogram Generated"
     
-    return mega_histogram
+    return mega_histogram, vStack
         

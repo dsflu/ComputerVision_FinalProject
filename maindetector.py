@@ -6,16 +6,24 @@ from glob import glob
 import numpy as np
 import pandas as pd
 import bow as bow
+import trainModels as tm
 
 
 def train_Model(images, nlabels, bowdata, k_size, n_images):
     if not isfile(bowdata+".npy"):
         x = time()
-        mega_histogram = bow.bag_of_words(images, k_size,n_images)
+        mega_histogram, v = bow.bag_of_words(images, k_size,n_images)
+        np.save(file=bowdata, arr=mega_histogram)
         y = time()
         print("Create BOW: ", y - x, ".s")
-#        w = time()
-        return mega_histogram
+    else:
+        mega_histogram = np.load(bowdata+".npy")
+        print(".s")
+        
+    mega_histogram = tm.standardization(mega_histogram)
+    clf = tm.SVM(mega_histogram, nlabels)
+    return clf
+    
 #def recognize_Pic(self,test_img, test_image_path=None):
 #    ''' '''
 #    
@@ -30,7 +38,7 @@ if __name__ == '__main__':
         im = cv2.imread(img, flags=cv2.IMREAD_COLOR)
         images.append(im)
         count +=1 
-    labels_data = pd.read_csv('csv/label.csv',header=None)
+    labels_data = pd.read_csv('csv/fakelabel.csv',header=None)
     labels = labels_data[0].tolist()
              
     k_list = [3]
@@ -39,4 +47,4 @@ if __name__ == '__main__':
         print("\n\nK = " + str(ks))
         bowdata = "bowdata/bow_"+"k_"+str(k)
 #        rfilename = "doc/img/shape"+"sift"+"_"+str(k)
-        mega_histogram = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
+        clf = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
