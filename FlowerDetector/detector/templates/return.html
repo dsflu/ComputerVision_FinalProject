@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<!-- CODED BY XIANGWEI SHI and FENG LU -->
+<html lang="en">
+	<head>
+		{%load static%}
+		<meta charset="UTF-8">
+		<title>FlowerDetector</title>
+	</head>
+	<body>
+		<div align="center">
+		{% if file_path %}
+		<img src="{% static file_path %}" height="600" width="800"/>
+		{% endif %}
+		</div>
+		
+	</body>
+</html>
