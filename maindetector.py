@@ -10,6 +10,7 @@ import trainModels as tm
 
 
 def train_Model(images, nlabels, bowdata, k_size, n_images):
+    Scores = {}
     if not isfile(bowdata+".npy"):
         x = time()
         mega_histogram, v = bow.bag_of_words(images, k_size,n_images)
@@ -21,13 +22,28 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
         print(".s")
         
     mega_histogram = tm.standardization(mega_histogram)
-    clf = tm.SVM(mega_histogram, nlabels)
-    return clf
+    clf1, score1, clf2, score2 = tm.SVM(mega_histogram, nlabels,5)
+    clf3, score3, clf4, score4 = tm.RF(mega_histogram, nlabels,5)
+    
+    Scores[clf1] = score1
+    Scores[clf2] = score2
+    Scores[clf3] = score3
+    Scores[clf4] = score4
+
+    S = sorted(Scores.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
+    
+    eclf1 = S[0][0]
+    eclf2 = S[1][0]
+    
+    eclf,err = tm.fit_clf_Data(eclf1,eclf2,mega_histogram, labels)
+    
+    return eclf,err
     
 #def recognize_Pic(self,test_img, test_image_path=None):
 #    ''' '''
 #    
-#def test_Model(self):
+#def test_Model(classifier):
+    
 
 if __name__ == '__main__':
     
@@ -47,4 +63,11 @@ if __name__ == '__main__':
         print("\n\nK = " + str(ks))
         bowdata = "bowdata/bow_"+"k_"+str(k)
 #        rfilename = "doc/img/shape"+"sift"+"_"+str(k)
-        clf = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
+        eclf,err = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
+#        test_Model(clf)
+        
+        
+        
+        
+        
+        

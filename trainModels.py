@@ -7,18 +7,56 @@ Created on Mon Jun 19 22:32:09 2017
 """
 
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import median_absolute_error
 from sklearn.svm import SVC
-
-
+from sklearn.ensemble import RandomForestClassifier,VotingClassifier
+import numpy as np
 
 def standardization(mega_histogram):
     scale = StandardScaler().fit(mega_histogram)
     mega_histogram = scale.transform(mega_histogram)
     return mega_histogram
 
-def SVM(mega_histogram, labels):
-    print "Using SVM as classification"
-    classifier = SVC()
-    classifier.fit(mega_histogram, labels)
-    print "SVM finished"
-    return classifier
+def SVM(mega_histogram, labels,k_fold):
+    svm_onevsall = SVC(cache_size=200, C=180, gamma=0.5, tol=1e-7, shrinking=False, decision_function_shape='ovr')
+    svm_onevsone = SVC(cache_size=200, C=180, gamma=0.5, tol=1e-7, shrinking=False, decision_function_shape='ovo')
+    print("SVM cross validation accuracy:")
+    scores_onevsall = cross_val_score(svm_onevsall, mega_histogram, labels, cv=k_fold)
+    print("\tSVM one vs all:")
+    print("\t\tBest: %0.2f"%scores_onevsall.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (scores_onevsall.mean(), scores_onevsall.std() * 2))
+    scores_onevsone = cross_val_score(svm_onevsone, mega_histogram, labels, cv=k_fold)
+    print("\tSVM one vs one:")
+    print("\t\tBest: %0.2f"%scores_onevsone.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (scores_onevsone.mean(), scores_onevsone.std() * 2))
+    return svm_onevsall, np.mean(scores_onevsall),svm_onevsone,np.mean(scores_onevsone)
+
+def RF(mega_histogram, labels,k_fold):
+    rfb = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=True, n_jobs=-1)
+    rfn = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=False, n_jobs=-1, bootstrap=False)
+    scoresrfb = cross_val_score(rfb, mega_histogram, labels, cv=k_fold)
+    scoresrfn = cross_val_score(rfn, mega_histogram, labels, cv=k_fold)
+    print("Random Forest cross validation accuracy:")
+    print("\tWith boosting")
+    print("\t\tBest: %0.2f" % scoresrfb.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (scoresrfb.mean(), scoresrfb.std() * 2))
+    print("\tWithout boosting")
+    print("\t\tBest: %0.2f" % scoresrfn.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (scoresrfn.mean(), scoresrfn.std() * 2))
+    return rfb,np.median(scoresrfb), rfn,np.median(scoresrfn)
+
+
+def fit_clf_Data(clf1,clf2,mega_histogram, labels):
+    print "fitting data to the selected models"
+#    clf1.fit(mega_histogram, labels)
+#    clf2.fit(mega_histogram, labels)
+#    clf3.fit(mega_histogram, labels)
+    print "Ensembling"
+    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2)], voting='hard')
+    eclf1 = eclf1.fit(mega_histogram, labels)
+    eclf1_pred = eclf1.predict(mega_histogram)
+    print "ensemble error: ", median_absolute_error(labels, eclf1_pred)
+    return eclf1, median_absolute_error(labels, eclf1_pred)
+    
+    
