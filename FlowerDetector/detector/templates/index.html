@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<!-- CODED BY XIANGWEI SHI and FENG LU -->
+<html lang="en">
+	<head>
+		{%load static%}
+		<meta charset="UTF-8">
+		<title>FlowerDetector</title>
+	</head>
+	<body>
+		<div align="center">
+		<img src="{% static "background.PNG" %}" height="600" width="800" />
+		</div>
+		<form enctype="multipart/form-data" action="/uploadFile/" method="post" align="middle">{% csrf_token %}
+			<input type="file" name="myfile"/>
+			<br/>
+			<input type="submit" value="upload"/>
+		</form>
+		
+	</body>
+</html>
+
