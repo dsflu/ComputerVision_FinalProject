@@ -13,12 +13,16 @@ def bag_of_words(images, k, n_images):
     for pic in images:
         kp, des= sift.detectAndCompute(pic, None)
         descriptor_list.append(des)
-        
+    print ("finish computing sift for all the images")
+    print ("enter kmeans")
     vStack = np.array(descriptor_list[0])
     for remaining in descriptor_list[1:]:
         vStack = np.vstack((vStack, remaining))
     descriptor_vstack = vStack.copy()
     kmeans_ret = KMeans(n_clusters = k).fit_predict(descriptor_vstack)
+    print ("finishing kmeans")
+    
+    print ("enter computing mega histogram")
     
     mega_histogram = np.array([np.zeros(k) for i in range(n_images)])
     old_count = 0

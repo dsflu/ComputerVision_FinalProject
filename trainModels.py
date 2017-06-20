@@ -57,6 +57,6 @@ def fit_clf_Data(clf1,clf2,mega_histogram, labels):
     eclf1 = eclf1.fit(mega_histogram, labels)
     eclf1_pred = eclf1.predict(mega_histogram)
     print "ensemble error: ", median_absolute_error(labels, eclf1_pred)
-    return eclf1, median_absolute_error(labels, eclf1_pred)
+    return eclf1, median_absolute_error(labels, eclf1_pred),eclf1_pred
     
     
