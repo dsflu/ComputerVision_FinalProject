@@ -11,6 +11,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from os.path import isfile
 from sklearn.externals import joblib
+from time import time
 
 def bag_of_words(images, k, n_images):
     print ("enter sift")
@@ -30,12 +31,15 @@ def bag_of_words(images, k, n_images):
         descriptor_list = np.load("desdata/descriptors.npy")
     print ("finish computing sift for all the images")
     print ("enter kmeans")
+    time1 = time()
     vStack = np.array(descriptor_list[0])
     for remaining in descriptor_list[1:]:
         vStack = np.vstack((vStack, remaining))
     descriptor_vstack = vStack.copy()
     kmeans_ret = clf_k.fit_predict(descriptor_vstack)
+    time2 = time()
     print ("finishing kmeans")
+    print("Kmeans time: ", time2 - time1, ".s")
     joblib.dump(clf_k, "trainedModel/kmeans_"+str(k)+".m")
     
     print ("enter computing mega histogram")

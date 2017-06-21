@@ -28,11 +28,11 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
     Scores = {}
     k_fold = 10
     if not isfile(bowdata+".npy"):
-        x = time()
+        time1 = time()
         mega_histogram, v = bow.bag_of_words(images, k_size,n_images)
         np.save(file=bowdata, arr=mega_histogram)
-        y = time()
-        print("Create BOW: ", y - x, ".s")
+        time2 = time()
+        print("Create BOW: ", time2 - time1, ".s")
     else:
         mega_histogram = np.load(bowdata+".npy")
         print(".s")
@@ -41,6 +41,8 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
     clf1, score1, clf2, score2 = tm.SVM(mega_histogram, nlabels,k_fold)
     clf3, score3, clf4, score4 = tm.RF(mega_histogram, nlabels,k_fold)
     clf5, score5 = tm.AdaBoost(mega_histogram, nlabels,k_fold)
+    clf6, score6 = tm.MLP(mega_histogram, nlabels,k_fold)
+    clf7, score7 = tm.Bagging(mega_histogram, nlabels,k_fold)
     print ("end classification")
     print ("enter ensemble")
     Scores[clf1] = score1
@@ -48,6 +50,8 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
     Scores[clf3] = score3
     Scores[clf4] = score4
     Scores[clf5] = score5
+    Scores[clf6] = score6
+    Scores[clf7] = score7
 
     S = sorted(Scores.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
     
@@ -109,7 +113,7 @@ if __name__ == '__main__':
     test_labels = [total_labels[i-1] for i in test_list]
     count = len(images)
              
-    k_list = [10]
+    k_list = [50]
     print ('phase 1 done')
     for k in k_list:
         print("\n\nK = " + str(k))

@@ -10,7 +10,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier,VotingClassifier,AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier,VotingClassifier,AdaBoostClassifier,BaggingClassifier
+from sklearn.neural_network import MLPClassifier
 import numpy as np
 
 def standardization(mega_histogram):
@@ -18,8 +19,26 @@ def standardization(mega_histogram):
     mega_histogram = scale.transform(mega_histogram)
     return mega_histogram
 
+def Bagging(mega_histogram, labels,k_fold):
+    bag = BaggingClassifier()
+    print("BaggingClassifier cross validation accuracy:")
+    score_bag = cross_val_score(bag, mega_histogram, labels, cv=k_fold)
+    print("\t\tBest: %0.2f"%score_bag.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (score_bag.mean(), score_bag.std() * 2))
+    return bag, np.median(score_bag)
+    
+
+def MLP(mega_histogram, labels,k_fold):
+    mlp = MLPClassifier(hidden_layer_sizes=(100,200,100,))
+    print("MLP cross validation accuracy:")
+    score_mlp = cross_val_score(mlp, mega_histogram, labels, cv=k_fold)
+    print("\t\tBest: %0.2f"%score_mlp.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (score_mlp.mean(), score_mlp.std() * 2))
+    return mlp, np.median(score_mlp)
+
+    
 def AdaBoost(mega_histogram, labels,k_fold):
-    ada = AdaBoostClassifier()
+    ada = AdaBoostClassifier(learning_rate=0.01)
     print("AdaBoost cross validation accuracy:")
     score_ada = cross_val_score(ada, mega_histogram, labels, cv=k_fold)
     print("\t\tBest: %0.2f"%score_ada.max())
