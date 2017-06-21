@@ -8,7 +8,7 @@ Created on Mon Jun 19 22:32:09 2017
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import median_absolute_error
+from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier,VotingClassifier
 import numpy as np
@@ -56,7 +56,19 @@ def fit_clf_Data(clf1,clf2,mega_histogram, labels):
     eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2)], voting='hard')
     eclf1 = eclf1.fit(mega_histogram, labels)
     eclf1_pred = eclf1.predict(mega_histogram)
-    print "ensemble error: ", median_absolute_error(labels, eclf1_pred)
-    return eclf1, median_absolute_error(labels, eclf1_pred),eclf1_pred
+    print "ensemble acc: ", accuracy_score(labels, eclf1_pred)
+    return eclf1, accuracy_score(labels, eclf1_pred),eclf1_pred
+
+def test_clf(clf,mega_histogram,labels):
+    print "test data to the model"
+    clf_pred = clf.predict(mega_histogram)
+    print "test acc: ", accuracy_score(labels, clf_pred)
+    return accuracy_score(labels, clf_pred),clf_pred
+
+def recognize(mega_histogram,clf):
+    clf_pred = clf.predict(mega_histogram)
+    return clf_pred
+    
+    
     
     
