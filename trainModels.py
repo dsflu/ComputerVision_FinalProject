@@ -10,13 +10,22 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier,VotingClassifier
+from sklearn.ensemble import RandomForestClassifier,VotingClassifier,AdaBoostClassifier
 import numpy as np
 
 def standardization(mega_histogram):
     scale = StandardScaler().fit(mega_histogram)
     mega_histogram = scale.transform(mega_histogram)
     return mega_histogram
+
+def AdaBoost(mega_histogram, labels,k_fold):
+    ada = AdaBoostClassifier()
+    print("AdaBoost cross validation accuracy:")
+    score_ada = cross_val_score(ada, mega_histogram, labels, cv=k_fold)
+    print("\t\tBest: %0.2f"%score_ada.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (score_ada.mean(), score_ada.std() * 2))
+    return ada, np.median(score_ada)
+    
 
 def SVM(mega_histogram, labels,k_fold):
     svm_onevsall = SVC(cache_size=200, C=180, gamma=0.5, tol=1e-7, shrinking=False, decision_function_shape='ovr')
@@ -30,7 +39,7 @@ def SVM(mega_histogram, labels,k_fold):
     print("\tSVM one vs one:")
     print("\t\tBest: %0.2f"%scores_onevsone.max())
     print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (scores_onevsone.mean(), scores_onevsone.std() * 2))
-    return svm_onevsall, np.mean(scores_onevsall),svm_onevsone,np.mean(scores_onevsone)
+    return svm_onevsall, np.median(scores_onevsall),svm_onevsone,np.median(scores_onevsone)
 
 def RF(mega_histogram, labels,k_fold):
     rfb = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=True, n_jobs=-1)
@@ -47,13 +56,13 @@ def RF(mega_histogram, labels,k_fold):
     return rfb,np.median(scoresrfb), rfn,np.median(scoresrfn)
 
 
-def fit_clf_Data(clf1,clf2,mega_histogram, labels):
+def fit_clf_Data(clf1,clf2,clf3,mega_histogram, labels):
     print "fitting data to the selected models"
 #    clf1.fit(mega_histogram, labels)
 #    clf2.fit(mega_histogram, labels)
 #    clf3.fit(mega_histogram, labels)
     print "Ensembling"
-    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2)], voting='hard')
+    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2),('clf3', clf3)], voting='hard')
     eclf1 = eclf1.fit(mega_histogram, labels)
     eclf1_pred = eclf1.predict(mega_histogram)
     print "ensemble acc: ", accuracy_score(labels, eclf1_pred)

@@ -26,6 +26,7 @@ Todo:
 
 def train_Model(images, nlabels, bowdata, k_size, n_images):
     Scores = {}
+    k_fold = 10
     if not isfile(bowdata+".npy"):
         x = time()
         mega_histogram, v = bow.bag_of_words(images, k_size,n_images)
@@ -37,21 +38,24 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
         print(".s")
     print ("enter classification")
     mega_histogram = tm.standardization(mega_histogram)
-    clf1, score1, clf2, score2 = tm.SVM(mega_histogram, nlabels,5)
-    clf3, score3, clf4, score4 = tm.RF(mega_histogram, nlabels,5)
+    clf1, score1, clf2, score2 = tm.SVM(mega_histogram, nlabels,k_fold)
+    clf3, score3, clf4, score4 = tm.RF(mega_histogram, nlabels,k_fold)
+    clf5, score5 = tm.AdaBoost(mega_histogram, nlabels,k_fold)
     print ("end classification")
     print ("enter ensemble")
     Scores[clf1] = score1
     Scores[clf2] = score2
     Scores[clf3] = score3
     Scores[clf4] = score4
+    Scores[clf5] = score5
 
     S = sorted(Scores.items(), lambda x, y: cmp(x[1], y[1]), reverse=True)
     
     eclf1 = S[0][0]
     eclf2 = S[1][0]
+    eclf3 = S[2][0]
     
-    eclf,score,pred = tm.fit_clf_Data(eclf1,eclf2,mega_histogram, labels)
+    eclf,score,pred = tm.fit_clf_Data(eclf1,eclf2,eclf3,mega_histogram, labels)
     print ("end ensemble")
     
     return eclf,err,pred
