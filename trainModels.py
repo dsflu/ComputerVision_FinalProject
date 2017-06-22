@@ -81,7 +81,7 @@ def fit_clf_Data(clf1,clf2,clf3,mega_histogram, labels):
 #    clf2.fit(mega_histogram, labels)
 #    clf3.fit(mega_histogram, labels)
     print "Ensembling"
-    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2),('clf3', clf3)], voting='hard')
+    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2),('clf3', clf3)], voting='soft')
     eclf1 = eclf1.fit(mega_histogram, labels)
     eclf1_pred = eclf1.predict(mega_histogram)
     print "ensemble acc: ", accuracy_score(labels, eclf1_pred)
@@ -95,7 +95,8 @@ def test_clf(clf,mega_histogram,labels):
 
 def recognize(mega_histogram,clf):
     clf_pred = clf.predict(mega_histogram)
-    return clf_pred
+    cfl_pred2 = clf.predict_proba(mega_histogram)
+    return clf_pred,cfl_pred2
     
     
     

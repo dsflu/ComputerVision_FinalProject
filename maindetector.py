@@ -62,7 +62,7 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
     eclf,score,pred = tm.fit_clf_Data(eclf1,eclf2,eclf3,mega_histogram, labels)
     print ("end ensemble")
     
-    return eclf,err,pred
+    return eclf,score,pred
        
 def test_Model(images,nlabels,bowdata, k_size, clf):
     if not isfile(bowdata+".npy"):
@@ -87,47 +87,53 @@ def recognizeImage(image, k_size,clf):
 
 if __name__ == '__main__':
     
-    images = []
-    count = 0
-    path = './training_data/*.jpg'
-    train_id = pd.read_csv('csv/train_id.csv',header=None)
-    test_id = pd.read_csv('csv/validation_id.csv',header=None)
-    train_list = train_id[0].tolist()
-    test_list = test_id[0].tolist()
-    images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
-                         flags=cv2.IMREAD_COLOR) for i in train_list]
-    test_images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
-                         flags=cv2.IMREAD_COLOR) for i in test_list]
+    flag_train_test = 0
     
-    image_rec = cv2.imread('recognize/image_00001.jpg')
-    
-#    for img in glob(path):
-#        im = cv2.imread(img, flags=cv2.IMREAD_COLOR)
-#        images.append(im)
-#        count +=1 
-    labels_data = pd.read_csv('csv/label.csv',header=None)
-    total_labels = labels_data[0].tolist()
-    labels =[]
-    test_labels = []
-    labels = [total_labels[i-1] for i in train_list]
-    test_labels = [total_labels[i-1] for i in test_list]
-    count = len(images)
-             
-    k_list = [50]
-    print ('phase 1 done')
-    for k in k_list:
+    if flag_train_test:
+        images = []
+        count = 0
+        path = './training_data/*.jpg'
+        train_id = pd.read_csv('csv/train_id.csv',header=None)
+        test_id = pd.read_csv('csv/validation_id.csv',header=None)
+        train_list = train_id[0].tolist()
+        test_list = test_id[0].tolist()
+        images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
+                             flags=cv2.IMREAD_COLOR) for i in train_list]
+        test_images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
+                             flags=cv2.IMREAD_COLOR) for i in test_list]
+        
+        image_rec = cv2.imread('recognize/image_00001.jpg')
+        
+    #    for img in glob(path):
+    #        im = cv2.imread(img, flags=cv2.IMREAD_COLOR)
+    #        images.append(im)
+    #        count +=1 
+        labels_data = pd.read_csv('csv/label.csv',header=None)
+        total_labels = labels_data[0].tolist()
+        labels =[]
+        test_labels = []
+        labels = [total_labels[i-1] for i in train_list]
+        test_labels = [total_labels[i-1] for i in test_list]
+        count = len(images)
+                 
+        k = 50
+        print ('phase 1 done')
+        
         print("\n\nK = " + str(k))
         bowdata = "bowdata/bow_"+"k_"+str(k)
         test_bowdata = "bowdata/bow_test_"+"k_"+str(k)
-#        rfilename = "doc/img/shape"+"sift"+"_"+str(k)
+    #        rfilename = "doc/img/shape"+"sift"+"_"+str(k)
         eclf,score,train_pred = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
         test_pred = test_Model(images=test_images,nlabels=test_labels,bowdata=test_bowdata, k_size=k, clf = eclf)
         joblib.dump(eclf, "trainedModel/eclf_"+str(k)+".m")
         
-    k = 10
-    eclf = joblib.load("trainedModel/eclf_"+str(k)+".m")
-    pred = recognizeImage(image_rec, k, eclf)
-    print ('\n\nThe predicted label is: '+str(pred)+'\n\n')
+    else:
+        
+        k = 50
+        eclf = joblib.load("trainedModel/eclf_"+str(k)+".m")
+        pred,pred2 = recognizeImage(image_rec, k, eclf)
+        print ('\n\nThe predicted label is: '+str(pred)+'\n'+'Confidence is: '+str(pred2[0][pred[0]-1])+'\n\n')
+        
 #    fileObject1 = open('True_Labels.txt', 'w') 
 #    for ip in labels:  
 #         fileObject1.write(str(ip))
