@@ -16,6 +16,8 @@ import pandas as pd
 import bow as bow
 import trainModels as tm
 from sklearn.externals import joblib
+import random
+
 '''
 Todo:
     1. training data
@@ -28,23 +30,22 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
     Scores = {}
     k_fold = 10
     if not isfile(bowdata+".npy"):
-        mega_histogram, v = bow.bag_of_words(images, k_size,n_images)
-        np.save(file=bowdata, arr=mega_histogram)
+        histogram, des = bow.bag_of_words(images, k_size,n_images)
+        np.save(file=bowdata, arr=histogram)
     else:
-        mega_histogram = np.load(bowdata+".npy")
+        histogram = np.load(bowdata+".npy")
     print("finish computing histogram")
     print ("enter classification")
-    mega_histogram = tm.standardization(mega_histogram)
-    clf1, score1, clf2, score2 = tm.SVM(mega_histogram, nlabels,k_fold)
-    clf3, score3, clf4, score4 = tm.RF(mega_histogram, nlabels,k_fold)
-    clf5, score5 = tm.AdaBoost(mega_histogram, nlabels,k_fold)
-    clf6, score6 = tm.MLP(mega_histogram, nlabels,k_fold)
-    clf7, score7 = tm.Bagging(mega_histogram, nlabels,k_fold)
-    clf8, score8 = tm.Logistic(mega_histogram, nlabels,k_fold)
+    histogram = tm.standardization(histogram)
+    clf1, score1 = tm.SVM(histogram, nlabels,k_fold)
+    clf3, score3, clf4, score4 = tm.RF(histogram, nlabels,k_fold)
+    clf5, score5 = tm.AdaBoost(histogram, nlabels,k_fold)
+    clf6, score6 = tm.MLP(histogram, nlabels,k_fold)
+    clf7, score7 = tm.Bagging(histogram, nlabels,k_fold)
+    clf8, score8 = tm.Logistic(histogram, nlabels,k_fold)
     print ("end classification")
     print ("enter ensemble")
     Scores[clf1] = score1
-    Scores[clf2] = score2
     Scores[clf3] = score3
     Scores[clf4] = score4
     Scores[clf5] = score5
@@ -58,40 +59,50 @@ def train_Model(images, nlabels, bowdata, k_size, n_images):
     eclf2 = S[1][0]
     eclf3 = S[2][0]
     
-    eclf,score,pred = tm.fit_clf_Data(eclf1,eclf2,eclf3,mega_histogram, nlabels)
+#    eclf,score,pred = tm.fit_clf_Data(eclf1,eclf2,eclf3,histogram, nlabels)
+    eclf,score,pred = tm.fit_clf_Data(eclf1,eclf2,histogram, nlabels)
     print ("end ensemble")
     
     return eclf,score,pred
        
 def test_Model(images,nlabels,bowdata, k_size, clf):
     if not isfile(bowdata+".npy"):
-        mega_histogram, v = bow.bag_of_words_test(images, k_size)
-        np.save(file=bowdata, arr=mega_histogram)
+        histogram, des = bow.bag_of_words_test(images, k_size)
+#        np.save(file=bowdata, arr=histogram)
     else:
-        mega_histogram = np.load(bowdata+".npy")
+        histogram = np.load(bowdata+".npy")
     print("finish computing histogram")   
-    mega_histogram = tm.standardization(mega_histogram)
+    histogram = tm.standardization(histogram)
     print ("enter clf test")
-    score,pred = tm.test_clf(clf,mega_histogram, nlabels)
+    score,pred = tm.test_clf(clf,histogram, nlabels)
     return pred
 
 def recognizeImage(image, k_size,clf):
-    mega_histogram = bow.bag_of_words_rec(image, k_size)
-    mega_histogram = tm.standardization(mega_histogram)
-    pred = tm.recognize(mega_histogram,clf)
+    histogram = bow.bag_of_words_rec(image, k_size)
+    histogram = tm.standardization(histogram)
+    pred = tm.recognize(histogram,clf)
     return pred
 
 if __name__ == '__main__':
     
-    flag_train_test = 0
+    flag_train_test = 1
     
     if flag_train_test:
+        
+        d_test = [random.randint(1, 8190) for i in range(100)]
+        data = pd.Series(d_test)
+        data.to_csv('csv/test_id.csv',index=False,header=False)
+        
+        
         images = []
         count = 0
         path = './training_data/*.jpg'
-        train_id = pd.read_csv('csv/train_id.csv',header=None)
-        test_id = pd.read_csv('csv/test.csv',header=None)
-        train_list = train_id[0].tolist()
+        train_id1 = pd.read_csv('csv/train_id1.csv',header=None)
+        train_id2 = pd.read_csv('csv/train_id2.csv',header=None)
+        test_id = pd.read_csv('csv/test_id.csv',header=None)
+        train_list1 = train_id1[0].tolist()
+        train_list2 = train_id2[0].tolist()
+        train_list = train_list1 + train_list2
         test_list = test_id[0].tolist()
         images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
                              flags=cv2.IMREAD_COLOR) for i in train_list]
@@ -114,10 +125,9 @@ if __name__ == '__main__':
                  
         k = 200
         print ('phase 1 done')
-        
-        print("\n\nK = " + str(k))
-        bowdata = "bowdata/bow_"+"k_"+str(k)
-        test_bowdata = "bowdata/bow_test_300"+"k_"+str(k)
+        print("\nK = " + str(k))
+        bowdata = "bowdata/bow_"+ str(k)
+        test_bowdata = "bowdata/bow_test_100_"+"k_"+str(k)
     #        rfilename = "doc/img/shape"+"sift"+"_"+str(k)
         eclf,score,train_pred = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
         joblib.dump(eclf, "trainedModel/eclf_"+str(k)+".m")
