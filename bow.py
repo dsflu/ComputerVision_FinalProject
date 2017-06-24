@@ -15,13 +15,10 @@ from time import time
 
 def bag_of_words(images, k, n_images):
     print ("enter sift")
-    # create the codebook
     clf_k = KMeans(n_clusters = k)
     descriptor_list = []
     sift = cv2.xfeatures2d.SIFT_create()
-#    BOW = cv2.BOWKMeansTrainer(k)
-#    kp = []
-#    des_list = []
+
     if not isfile("desdata/descriptors.npy"):
         for pic in images:
             kp, des= sift.detectAndCompute(pic, None)
@@ -42,7 +39,7 @@ def bag_of_words(images, k, n_images):
     print("Kmeans time: ", time2 - time1, ".s")
     joblib.dump(clf_k, "trainedModel/kmeans_"+str(k)+".m")
     
-    print ("enter computing mega histogram")
+    print ("enter computing histogram")
     
     mega_histogram = np.array([np.zeros(k) for i in range(n_images)])
     old_count = 0
@@ -62,24 +59,26 @@ def bag_of_words_test(images, k):
     print ("test: enter sift")
     descriptor_list = []
     sift = cv2.xfeatures2d.SIFT_create()
-    if not isfile("desdata/descriptors_test.npy"):
+    if not isfile("desdata/descriptors_test_300.npy"):
         for pic in images:
             kp, des= sift.detectAndCompute(pic, None)
             descriptor_list.append(des)
-        np.save(file="desdata/descriptors_test", arr=descriptor_list)
+        np.save(file="desdata/descriptors_test_300", arr=descriptor_list)
     else:
-        descriptor_list = np.load("desdata/descriptors_test.npy")
+        descriptor_list = np.load("desdata/descriptors_test_300.npy")
     print ("test: finish computing sift for all the images")
     print ("test: enter kmeans")
+    time1 = time()
     vStack = np.array(descriptor_list[0])
     for remaining in descriptor_list[1:]:
         vStack = np.vstack((vStack, remaining))
     descriptor_vstack = vStack.copy()
     print ("test: start kmeans prediction")
     kmeans_ret = clf_k.predict(descriptor_vstack)
+    time2 = time()
     print ("test: finish kmeans")
-    
-    print ("test: enter computing mega histogram")
+    print("test: Kmeans time: ", time2 - time1, ".s")
+    print ("test: enter computing histogram")
     
     mega_histogram = np.array([np.zeros(k) for i in range(n_images)])
     old_count = 0

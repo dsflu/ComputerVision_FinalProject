@@ -12,12 +12,22 @@ from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier,VotingClassifier,AdaBoostClassifier,BaggingClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
 import numpy as np
 
 def standardization(mega_histogram):
     scale = StandardScaler().fit(mega_histogram)
     mega_histogram = scale.transform(mega_histogram)
     return mega_histogram
+
+
+def Logistic(mega_histogram, labels,k_fold):
+    log = LogisticRegression()
+    print("Logistic cross validation accuracy:")
+    score_log = cross_val_score(log, mega_histogram, labels, cv=k_fold)
+    print("\t\tBest: %0.2f"%score_log.max())
+    print("\t\tAccuracy: %0.2f (+/- %0.2f)" % (score_log.mean(), score_log.std() * 2))
+    return log, np.median(score_log)
 
 def Bagging(mega_histogram, labels,k_fold):
     bag = BaggingClassifier()
@@ -29,7 +39,7 @@ def Bagging(mega_histogram, labels,k_fold):
     
 
 def MLP(mega_histogram, labels,k_fold):
-    mlp = MLPClassifier(hidden_layer_sizes=(100,200,100,))
+    mlp = MLPClassifier(hidden_layer_sizes=(256,1024,512,128,))
     print("MLP cross validation accuracy:")
     score_mlp = cross_val_score(mlp, mega_histogram, labels, cv=k_fold)
     print("\t\tBest: %0.2f"%score_mlp.max())
@@ -47,7 +57,8 @@ def AdaBoost(mega_histogram, labels,k_fold):
     
 
 def SVM(mega_histogram, labels,k_fold):
-    svm_onevsall = SVC(cache_size=200, C=180, gamma=0.5, tol=1e-7, shrinking=False, decision_function_shape='ovr')
+    svm_onevsall = SVC(probability=True)
+#    svm_onevsall = SVC(cache_size=200, C=180, gamma=0.5, tol=1e-7, shrinking=False, decision_function_shape='ovr')
     svm_onevsone = SVC(cache_size=200, C=180, gamma=0.5, tol=1e-7, shrinking=False, decision_function_shape='ovo')
     print("SVM cross validation accuracy:")
     scores_onevsall = cross_val_score(svm_onevsall, mega_histogram, labels, cv=k_fold)
