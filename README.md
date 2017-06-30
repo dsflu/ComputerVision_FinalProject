@@ -1,7 +1,7 @@
 # ComputerVision_FinalProject
 
 ### Authors
-Made by  [Feng Lu](URL 'https://github.com/fredericklu') and Xiangwei Shi for the IN4393: Computer Vision Project
+Made by  [Feng Lu](https://github.com/fredericklu) and Xiangwei Shi for the IN4393: Computer Vision Project
 
 #### This is a flower species recognizing system based on 'bag of visual word' algorithm with an intereface.
 This file is built for interpretation.
