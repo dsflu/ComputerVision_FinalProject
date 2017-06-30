@@ -1,5 +1,8 @@
 # ComputerVision_FinalProject
 
+### Authors
+Made by  [Feng Lu](URL 'https://github.com/fredericklu') and Xiangwei Shi for the IN4393: Computer Vision Project
+
 #### This is a flower species recognizing system based on 'bag of visual word' algorithm with an intereface.
 This file is built for interpretation.
 Before you download and use these codes. You need to know that this system is built in Python2 with OpenCV3 package, scikit-learn package and Django package(0.11).
