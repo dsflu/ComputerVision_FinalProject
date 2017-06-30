@@ -30,5 +30,4 @@ You can install the environment and the packages if you need.
 #### One thing needs to be mentioned: The testing image of flower needs to be taken in close range. And the fewer flowers appearing in one image, the better result can be obtained.
 
 ### DEMO 
-**Youtube**
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/t9dBP9JV2Jk/0.jpg)](https://www.youtube.com/watch?v=t9dBP9JV2Jk)
