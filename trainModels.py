@@ -68,8 +68,8 @@ def SVM(histogram, labels,k_fold):
     return svm, np.mean(score_svm)
 
 def RF(histogram, labels,k_fold):
-    rf1 = RandomForestClassifier(criterion="entropy", oob_score=True)
-    rf2 = RandomForestClassifier(criterion="entropy", oob_score=False, bootstrap=False)
+    rf1 = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=True, n_jobs=-1)
+    rf2 = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=False, n_jobs=-1, bootstrap=False)
     score_rf1 = cross_val_score(rf1, histogram, labels, cv=k_fold)
     score_rf2 = cross_val_score(rf2, histogram, labels, cv=k_fold)
     print("Random Forest cross validation Mean accuracy:")

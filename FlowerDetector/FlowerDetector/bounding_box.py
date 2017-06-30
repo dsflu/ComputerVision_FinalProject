@@ -6,9 +6,11 @@ Created on Sun Jun 18 20:50:37 2017
 """
 import cv2
 import numpy as np
+import os
 
-def bounding_box(file_path):
-    img = cv2.imread(file_path)  
+def bounding_box(file_path, file_name):
+    path = os.path.join(file_path,file_name)
+    img = cv2.imread(path)
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray,(21,21),0)
     ret, thresh = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
@@ -31,4 +33,5 @@ def bounding_box(file_path):
             break
         else:
             i = i+1
-    cv2.imwrite(file_path,img)
+    path = os.path.join(file_path,'example.jpg')
+    cv2.imwrite(path,img)

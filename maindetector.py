@@ -141,9 +141,9 @@ if __name__ == '__main__':
         train_list2 = train_id2[0].tolist()
         train_list = train_list1 + train_list2
         test_list = test_id[0].tolist()
-        images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
+        images = [cv2.imread('training_hsv/image_' + '%0*d' % (5, i) + '.jpg',
                              flags=cv2.IMREAD_COLOR) for i in train_list]
-        test_images = [cv2.imread('training_data/image_' + '%0*d' % (5, i) + '.jpg',
+        test_images = [cv2.imread('training_hsv/image_' + '%0*d' % (5, i) + '.jpg',
                              flags=cv2.IMREAD_COLOR) for i in test_list]
     
         # read the corresponding labels for training and testing data
@@ -157,25 +157,26 @@ if __name__ == '__main__':
         
         # set the k size for the k-meaning clustering of bag of words
         # generally, larger k means higher accuracy while more time consuming
-        k = 200
+        k = 20
         print ('phase 1 done')
         print("\nK = " + str(k))
-        bowdata = "bowdata/bow_"+ str(k)
-        test_bowdata = "bowdata/bow_test_"+"k_"+str(k)
+#        bowdata = "bowdata/bow_"+ str(k)
+        bowdata = "bowdata/bow_hsv_"+ str(k)
+        test_bowdata = "bowdata/bow_test_hsv_"+"k_"+str(k)
     #        rfilename = "doc/img/shape"+"sift"+"_"+str(k)
     
         # train the model
-#        eclf,score,train_pred = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
+        eclf,score,train_pred = train_Model(images=images, nlabels=labels, bowdata=bowdata, k_size=k, n_images = count)
         # save the model
-#        joblib.dump(eclf, "trainedModel/eclf_"+str(k)+".m")
+        joblib.dump(eclf, "trainedModel/eclf_hsv_"+str(k)+".m")
         # test the model
-        eclf = joblib.load("trainedModel/eclf_"+str(k)+".m")
+#        eclf = joblib.load("trainedModel/eclf_hsv_"+str(k)+".m")
         test_pred = test_Model(images=test_images,nlabels=test_labels,bowdata=test_bowdata, k_size=k, clf = eclf)
         
         
     else:
         image_rec = cv2.imread('recognize/test.jpg')
-        k = 200
+        k = 20
         eclf = joblib.load("trainedModel/eclf_"+str(k)+".m")
         pred,pred2 = recognizeImage(image_rec, k, eclf)
         print ('\n\nThe predicted label is: '+str(pred)+'\n'+'Confidence is: '+str(pred2[0][pred[0]-1])+'\n\n')

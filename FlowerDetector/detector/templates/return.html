@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CODED BY XIANGWEI SHI and FENG LU -->
+<!-- CODED BY XIANGWEI SHI -->
 <html lang="en">
 	<head>
 		{%load static%}
@@ -8,10 +8,13 @@
 	</head>
 	<body>
 		<div align="center">
-		{% if file_path %}
-		<img src="{% static file_path %}" height="600" width="800"/>
+		{% if file_name %}
+		<img src="{% static 'example.jpg' %}" />
 		{% endif %}
+		<form action="/detection_image/" method="get">
+        {% csrf_token %}
+        <a href="detection_image"><input type="button" value="detect" /></a>
+        </form>
 		</div>
-		
 	</body>
 </html>

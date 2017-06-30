@@ -19,6 +19,7 @@ from detector import views as detector_views
 
 urlpatterns = [
 	url(r'^$', detector_views.index, name='home'),
-	url(r'^uploadFile',detector_views.upload_image, name='return'),
+	url(r'^uploadFile/$',detector_views.upload_image, name='return'),
+    url(r'^uploadFile/detection_image/$',detector_views.detect_image, name='detection'),
     url(r'^admin/', admin.site.urls),
 ]

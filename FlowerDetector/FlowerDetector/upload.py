@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jun 18 20:55:25 2017
+
+@author: Xiangwei Shi
+"""
 import os
 
 def upload_image(request):

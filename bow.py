@@ -25,13 +25,13 @@ def bag_of_words(images, k, n_images):
     sift = cv2.xfeatures2d.SIFT_create()
     
     # compute the sift descriptors
-    if not isfile("desdata/descriptors.npy"):
+    if not isfile("desdata/descriptors_hsv.npy"):
         for pic in images:
             kp, des= sift.detectAndCompute(pic, None)
             descriptor_list.append(des)
-        np.save(file="desdata/descriptors", arr=descriptor_list)
+        np.save(file="desdata/descriptors_hsv", arr=descriptor_list)
     else:
-        descriptor_list = np.load("desdata/descriptors.npy")
+        descriptor_list = np.load("desdata/descriptors_hsv.npy")
     print ("finish computing sift for all the images")
     # do the k-means clustering to get the codebook
     print ("enter kmeans")
@@ -44,7 +44,7 @@ def bag_of_words(images, k, n_images):
     time2 = time()
     print ("finishing kmeans")
     print("Kmeans time: ", time2 - time1, ".s")
-    joblib.dump(clf_k, "trainedModel/kmeans_"+str(k)+".m")
+    joblib.dump(clf_k, "trainedModel/kmeans_hsv_"+str(k)+".m")
     
     # recomputer the feature histogram for each image based on the codebook
     print ("enter computing histogram")
@@ -62,18 +62,18 @@ def bag_of_words(images, k, n_images):
     return histogram, np_des
 
 def bag_of_words_test(images, k):
-    clf_k = joblib.load("trainedModel/kmeans_"+str(k)+".m")
+    clf_k = joblib.load("trainedModel/kmeans_hsv_"+str(k)+".m")
     n_images = len(images)
     print ("test: enter sift")
     descriptor_list = []
     sift = cv2.xfeatures2d.SIFT_create()
-    if not isfile("desdata/descriptors_test.npy"):
+    if not isfile("desdata/descriptors_test_hsv.npy"):
         for pic in images:
             kp, des= sift.detectAndCompute(pic, None)
             descriptor_list.append(des)
 #        np.save(file="desdata/descriptors_test", arr=descriptor_list)
     else:
-        descriptor_list = np.load("desdata/descriptors_test.npy")
+        descriptor_list = np.load("desdata/descriptors_test_hsv.npy")
     print ("test: finish computing sift for all the images")
     print ("test: enter kmeans")
     time1 = time()
@@ -101,7 +101,7 @@ def bag_of_words_test(images, k):
     return histogram, np_des
 
 def bag_of_words_rec(image, k):
-    clf_k = joblib.load("trainedModel/kmeans_"+str(k)+".m")
+    clf_k = joblib.load("trainedModel/kmeans_hsv_"+str(k)+".m")
     sift = cv2.xfeatures2d.SIFT_create()
     kp, des= sift.detectAndCompute(image, None)
     clusters = clf_k.predict(des)
