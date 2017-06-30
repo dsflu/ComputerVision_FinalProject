@@ -13,12 +13,18 @@ from os.path import isfile
 from sklearn.externals import joblib
 from time import time
 
+'''
+compute bag of words based on the CV lab assignment
+While instead of using ramdon patches, we use the sift descriptors to
+construct the codebook.
+'''
 def bag_of_words(images, k, n_images):
     print ("enter sift")
     clf_k = KMeans(n_clusters = k)
     descriptor_list = []
     sift = cv2.xfeatures2d.SIFT_create()
-
+    
+    # compute the sift descriptors
     if not isfile("desdata/descriptors.npy"):
         for pic in images:
             kp, des= sift.detectAndCompute(pic, None)
@@ -27,6 +33,7 @@ def bag_of_words(images, k, n_images):
     else:
         descriptor_list = np.load("desdata/descriptors.npy")
     print ("finish computing sift for all the images")
+    # do the k-means clustering to get the codebook
     print ("enter kmeans")
     time1 = time()
     np_des = np.array(descriptor_list[0])
@@ -39,6 +46,7 @@ def bag_of_words(images, k, n_images):
     print("Kmeans time: ", time2 - time1, ".s")
     joblib.dump(clf_k, "trainedModel/kmeans_"+str(k)+".m")
     
+    # recomputer the feature histogram for each image based on the codebook
     print ("enter computing histogram")
     
     histogram = np.array([np.zeros(k) for i in range(n_images)])
@@ -59,13 +67,13 @@ def bag_of_words_test(images, k):
     print ("test: enter sift")
     descriptor_list = []
     sift = cv2.xfeatures2d.SIFT_create()
-    if not isfile("desdata/descriptors_test_100.npy"):
+    if not isfile("desdata/descriptors_test.npy"):
         for pic in images:
             kp, des= sift.detectAndCompute(pic, None)
             descriptor_list.append(des)
-#        np.save(file="desdata/descriptors_test_100", arr=descriptor_list)
+#        np.save(file="desdata/descriptors_test", arr=descriptor_list)
     else:
-        descriptor_list = np.load("desdata/descriptors_test_100.npy")
+        descriptor_list = np.load("desdata/descriptors_test.npy")
     print ("test: finish computing sift for all the images")
     print ("test: enter kmeans")
     time1 = time()

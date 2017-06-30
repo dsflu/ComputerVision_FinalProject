@@ -15,6 +15,9 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 
+'''
+model seetings are based on sklearn tutorial
+'''
 def standardization(histogram):
     scale = StandardScaler().fit(histogram)
     histogram = scale.transform(histogram)
@@ -59,33 +62,30 @@ def AdaBoost(histogram, labels,k_fold):
 def SVM(histogram, labels,k_fold):
     svm = SVC(probability=True)
     print("SVM cross validation Mean accuracy:")
-    scores_svm = cross_val_score(svm, histogram, labels, cv=k_fold)
-    print("\t\tBest Accuracy: %0.2f"%scores_svm.max())
-    print("\t\tMean Accuracy: %0.2f (+/- %0.2f)" % (scores_svm.mean(), scores_svm.std() * 2))
-    return svm, np.mean(scores_svm)
+    score_svm = cross_val_score(svm, histogram, labels, cv=k_fold)
+    print("\t\tBest Accuracy: %0.2f"%score_svm.max())
+    print("\t\tMean Accuracy: %0.2f (+/- %0.2f)" % (score_svm.mean(), score_svm.std() * 2))
+    return svm, np.mean(score_svm)
 
 def RF(histogram, labels,k_fold):
-    rfb = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=True, n_jobs=-1)
-    rfn = RandomForestClassifier(n_estimators=60, criterion="entropy", oob_score=False, n_jobs=-1, bootstrap=False)
-    scoresrfb = cross_val_score(rfb, histogram, labels, cv=k_fold)
-    scoresrfn = cross_val_score(rfn, histogram, labels, cv=k_fold)
+    rf1 = RandomForestClassifier(criterion="entropy", oob_score=True)
+    rf2 = RandomForestClassifier(criterion="entropy", oob_score=False, bootstrap=False)
+    score_rf1 = cross_val_score(rf1, histogram, labels, cv=k_fold)
+    score_rf2 = cross_val_score(rf2, histogram, labels, cv=k_fold)
     print("Random Forest cross validation Mean accuracy:")
     print("\tWith boosting")
-    print("\t\tBest Accuracy: %0.2f" % scoresrfb.max())
-    print("\t\tMean Accuracy: %0.2f (+/- %0.2f)" % (scoresrfb.mean(), scoresrfb.std() * 2))
+    print("\t\tBest Accuracy: %0.2f" % score_rf1.max())
+    print("\t\tMean Accuracy: %0.2f (+/- %0.2f)" % (score_rf1.mean(), score_rf1.std() * 2))
     print("\tWithout boosting")
-    print("\t\tBest Accuracy: %0.2f" % scoresrfn.max())
-    print("\t\tMean Accuracy: %0.2f (+/- %0.2f)" % (scoresrfn.mean(), scoresrfn.std() * 2))
-    return rfb,np.mean(scoresrfb), rfn,np.mean(scoresrfn)
+    print("\t\tBest Accuracy: %0.2f" % score_rf2.max())
+    print("\t\tMean Accuracy: %0.2f (+/- %0.2f)" % (score_rf2.mean(), score_rf2.std() * 2))
+    return rf1,np.mean(score_rf1), rf2,np.mean(score_rf2)
 
 
-def fit_clf_Data(clf1,clf2,histogram, labels):
+def fit_clf_Data(clf1,clf2,clf3,histogram, labels):
     print "fitting data to the selected models"
-#    clf1.fit(histogram, labels)
-#    clf2.fit(histogram, labels)
-#    clf3.fit(histogram, labels)
     print "Ensembling"
-    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2)], voting='soft')
+    eclf1 = VotingClassifier(estimators=[('clf1', clf1), ('clf2', clf2), ('clf3', clf3)],voting='soft')
     eclf1 = eclf1.fit(histogram, labels)
     eclf1_pred = eclf1.predict(histogram)
     print "ensemble acc: ", accuracy_score(labels, eclf1_pred)
