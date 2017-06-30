@@ -24,4 +24,4 @@ You can install the environment and the packages if you need.
 3. Once submitting a testing image, you can see a new interface with one image and one 'detect' button. The image shows a bounding box on your testing image, which detects the flower.
 4. The last kind of interface can show much informaction, such as the detected label with the highest confidence, a reference image from the dataset with the same label as the detected one, two other buttons for reuploading another test image and other information.
 
-#### One thind needs to be mentioned: The testing image of flower needs to be taken in close range. And the fewer flowers appearing in one image, the better result can be obtained.
+#### One thing needs to be mentioned: The testing image of flower needs to be taken in close range. And the fewer flowers appearing in one image, the better result can be obtained.
