@@ -17,10 +17,10 @@ def plot(k,histogram):
 		print y_scalar
 
 		plt.bar(x_scalar, y_scalar)
-		plt.xlabel("Visual Word Index")
-		plt.ylabel("Frequency")
-		plt.title("Complete Vocabulary Generated")
-		plt.xticks(x_scalar + 0.4, x_scalar)
+		plt.xlabel("Codebook Index")
+		plt.ylabel("Histogram Frequency")
+		plt.title("Bag of words")
+#		plt.xticks(x_scalar + 0.4, x_scalar)
 		plt.show()
 
 if __name__ == '__main__':

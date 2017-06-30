@@ -11,7 +11,13 @@ import os
 
 # Create your views here.
 message = {}
+# Please change the three paths below
+# address = "your/path/to/FlowerDetector/detector/static/"
+# img_address = "your/path/to/training_data/"
+# csv_address = "your/path/to/csv/label.csv"
 address = "/Users/fredlu/Developer/ComputerVision/FlowerDetector/detector/static/"
+img_address = "/Users/fredlu/Developer/ComputerVision/training_data/"
+csv_address = '/Users/fredlu/Developer/ComputerVision/csv/label.csv'
 
 def index(request):
     return render(request,'index.html')#request the homepage
@@ -46,15 +52,12 @@ def detect_image(request):
 		message['prediction'], message['confidence'] = detection(file_path)
 		number = int(message['prediction'])
 		# return HttpResponse(number)
-		labels_data = pd.read_csv('/Users/fredlu/Developer/ComputerVision/csv/label.csv',header=None)
+		labels_data = pd.read_csv(csv_address,header=None)
         label = labels_data[labels_data[0] == number]
         idx = label.index[0]+1
-        file_path = "/Users/fredlu/Developer/ComputerVision/training_data/"
+        file_path = img_address
         file_name = "image_"+'%0*d' % (5, idx) + '.jpg'
         message['file_name'] = file_name
         message['file_path'] = os.path.join(file_path, file_name)
         open(os.path.join(address, file_name),"wb").write(open(message['file_path'],"rb").read())
-
         return render(request,'detection.html',message)
-        
-		# 

@@ -8,6 +8,7 @@ from sklearn.externals import joblib
 import cv2
 from FlowerDetector.maindetector import recognizeImage
 
+#Change address into "your/path/to/FlowerDetector/FlowerDetector/trainedModel"
 address = "/Users/fredlu/Developer/ComputerVision/FlowerDetector/FlowerDetector/trainedModel"
 
 def detection(img_path):
