@@ -24,7 +24,7 @@ You can install the environment and the packages if you need.
 #### About the user interface:
 1. There are three different kinds of interfaces.
 2. After you log on the localhost, you will see the homepage of user interface. There are two buttons under a background image. The first one is to select an image that you want to recognize. The second button is a 'submit' button.
-3. Once submitting a testing image, you can see a new interface with one image and one 'detect' button. The image shows a bounding box on your testing image, which detects the flower.
+3. Once submitting a testing image, you can see a new interface with one image and one 'detect' button. The image shows a bounding box on your testing image, which contains the flower.
 4. The last kind of interface can show much informaction, such as the detected label with the highest confidence, a reference image from the dataset with the same label as the detected one, two other buttons for reuploading another test image and other information.
 
 #### One thing needs to be mentioned: The testing image of flower needs to be taken in close range. And the fewer flowers appearing in one image, the better result can be obtained.
